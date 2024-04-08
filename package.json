@@ -1,5 +1,5 @@
 {
-  "name": "asti-sra-node-revamp",
+  "name": "asti-sra-revamp",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
@@ -9,7 +9,8 @@
     "debug": "nodemon --inspect ./src/index.ts",
     "lint": "eslint --fix . && prettier --write .",
     "build": "tsc",
-    "reset:dev": "prisma migrate reset"
+    "reset:dev": "prisma migrate reset",
+    "prisma:generate": "prisma generate"
   },
   "prisma": {
     "seed": "ts-node prisma/seeders/index.ts"

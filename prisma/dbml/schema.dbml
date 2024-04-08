@@ -1,0 +1,329 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Person {
+  id Int [pk, increment]
+  personId String [unique, not null]
+  firstName String [not null]
+  middleName String
+  lastName String [not null]
+  gender PersonGender [not null]
+  suffix PersonSuffix [not null]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String
+  updatedAt DateTime
+  updatedBy String
+  personContactDetails PersonContactDetails [not null]
+  user User
+}
+
+Table ContactDetails {
+  id Int [pk, increment]
+  contactDetailsId String [unique, not null]
+  name String [unique, not null]
+  description String
+  personContactDetails PersonContactDetails [not null]
+}
+
+Table PersonContactDetails {
+  id Int [pk, increment]
+  personContactDetailsId String [unique, not null]
+  contactDetailsId String [not null]
+  personId String [not null]
+  value String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String
+  updatedAt DateTime
+  updatedBy String
+  person Person [not null]
+  contactDetails ContactDetails [not null]
+}
+
+Table User {
+  id Int [pk, increment]
+  userId String [unique, not null]
+  personId String [unique, not null]
+  roleId String [not null]
+  organizationId String [not null]
+  agency String [not null]
+  username String [unique, not null]
+  password String [not null]
+  isActive Int [not null, default: 0]
+  status UserStatus [not null, default: 'PENDING']
+  avatar String
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String
+  updatedAt DateTime
+  updatedBy String
+  person Person [not null]
+  role Role [not null]
+  organization Organization [not null]
+  documents Document [not null]
+  tokens Token [not null]
+  plots Plot [not null]
+  articles Article [not null]
+  millDistricts UserMillDistrict [not null]
+}
+
+Table Document {
+  id Int [pk, increment]
+  documentId String [unique, not null]
+  userId String [not null]
+  file Bytes [not null]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String
+  updatedAt DateTime
+  updatedBy String
+  user User [not null]
+}
+
+Table Role {
+  id Int [pk, increment]
+  roleId String [unique, not null]
+  name String [unique, not null]
+  description String
+  users User [not null]
+}
+
+Table Organization {
+  id Int [pk, increment]
+  organizationId String [unique, not null]
+  name String [unique, not null]
+  description String
+  users User [not null]
+}
+
+Table Token {
+  id Int [pk, increment]
+  tokenId String [unique, not null]
+  userId String [not null]
+  type TokenType [not null]
+  value String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String [not null]
+  updatedAt DateTime
+  updatedBy String
+  user User [not null]
+}
+
+Table Region {
+  id Int [pk, increment]
+  regionId String [unique, not null]
+  name String [unique, not null]
+  description String
+  shapeFile String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String [not null]
+  updatedAt DateTime
+  updatedBy String
+  millDistricts MillDistrict [not null]
+  provinces Province [not null]
+}
+
+Table Province {
+  id Int [pk, increment]
+  provinceId String [unique, not null]
+  regionId String [not null]
+  name String [unique, not null]
+  description String
+  shapeFile String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String [not null]
+  updatedAt DateTime
+  updatedBy String
+  cities City [not null]
+  region Region [not null]
+}
+
+Table City {
+  id Int [pk, increment]
+  cityId String [unique, not null]
+  provinceId String [not null]
+  name String [unique, not null]
+  description String
+  shapeFile String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String [not null]
+  updatedAt DateTime
+  updatedBy String
+  barangays Barangay [not null]
+  region Province [not null]
+}
+
+Table Barangay {
+  id Int [pk, increment]
+  barangayId String [unique, not null]
+  cityId String [not null]
+  name String [unique, not null]
+  description String
+  shapeFile String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String [not null]
+  updatedAt DateTime
+  updatedBy String
+  city City [not null]
+}
+
+Table Legend {
+  id Int [pk, increment]
+  legendId String [unique, not null]
+  name String [unique, not null]
+  description String
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String [not null]
+  updatedAt DateTime
+  updatedBy String
+  millDistrictLegend millDistrictLegend [not null]
+}
+
+Table MillDistrict {
+  id Int [pk, increment]
+  millDistrictId String [unique, not null]
+  regionId String [not null]
+  name String [unique, not null]
+  description String
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String [not null]
+  updatedAt DateTime
+  updatedBy String
+  region Region [not null]
+  users UserMillDistrict [not null]
+  millDistrictLegend millDistrictLegend [not null]
+}
+
+Table millDistrictLegend {
+  id Int [pk, increment]
+  millDistrictId String [not null]
+  legendId String [not null]
+  millDistrict MillDistrict [not null]
+  legend Legend [not null]
+}
+
+Table UserMillDistrict {
+  id Int [pk, increment]
+  userId String [not null]
+  millDistrictId String [not null]
+  user User [not null]
+  millDistrict MillDistrict [not null]
+
+  indexes {
+    (userId, millDistrictId) [unique]
+  }
+}
+
+Table Crop {
+  id Int [pk, increment]
+  cropId String [unique, not null]
+  name String [unique, not null]
+  description String
+}
+
+Table Plot {
+  id Int [pk, increment]
+  plotId String [unique, not null]
+  millDistrictId String [not null]
+  gisNumber String
+  varietyPlanted String
+  datePlantedRatoon DateTime
+  dateHarvested DateTime
+  establishment String
+  farmSystem String
+  furrowDistance Decimal
+  percentGermination Int
+  noMillTalks String
+  height Int
+  noInterNode Int
+  msDiameterTop Decimal
+  msDiameterMid Decimal
+  msDiameterBase Decimal
+  msLength Decimal
+  msWeight Decimal
+  brixTop Decimal
+  brixMid Decimal
+  brixBase Decimal
+  elevation Decimal
+  slope Decimal
+  soilTexture Decimal
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String [not null]
+  updatedAt DateTime
+  updatedBy String
+  user User [not null]
+}
+
+Table Article {
+  id Int [pk, increment]
+  articleId String [unique, not null]
+  userId String [not null]
+  title String [unique, not null]
+  content String [not null]
+  isActive Int [not null, default: 0]
+  status ArticleStatus [not null, default: 'PENDING']
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String [not null]
+  updatedAt DateTime
+  updatedBy String [not null]
+  user User [not null]
+}
+
+Enum PersonGender {
+  MALE
+  FEMALE
+  OTHERS
+}
+
+Enum PersonSuffix {
+  MR
+  MS
+  MRS
+}
+
+Enum TokenType {
+  REFRESH
+}
+
+Enum ArticleStatus {
+  PENDING
+  PUBLISHED
+}
+
+Enum UserStatus {
+  PENDING
+  APPROVED
+  DISAPPROVED
+}
+
+Ref: PersonContactDetails.personId > Person.personId
+
+Ref: PersonContactDetails.contactDetailsId > ContactDetails.contactDetailsId
+
+Ref: User.personId - Person.personId
+
+Ref: User.roleId > Role.roleId
+
+Ref: User.organizationId > Organization.organizationId
+
+Ref: Document.userId > User.userId
+
+Ref: Token.userId > User.userId
+
+Ref: Province.regionId > Region.regionId
+
+Ref: City.provinceId > Province.provinceId
+
+Ref: Barangay.cityId > City.cityId
+
+Ref: MillDistrict.regionId > Region.regionId
+
+Ref: millDistrictLegend.millDistrictId > MillDistrict.millDistrictId
+
+Ref: millDistrictLegend.legendId > Legend.legendId
+
+Ref: UserMillDistrict.userId > User.userId
+
+Ref: UserMillDistrict.millDistrictId > MillDistrict.millDistrictId
+
+Ref: Plot.createdBy > User.userId
+
+Ref: Article.userId > User.userId

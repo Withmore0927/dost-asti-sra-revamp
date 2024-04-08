@@ -1,0 +1,381 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum PersonGender {
+  MALE
+  FEMALE
+  OTHERS
+}
+
+enum PersonSuffix {
+  MR
+  MS
+  MRS
+}
+
+enum TokenType {
+  REFRESH
+}
+
+enum ArticleStatus {
+  PENDING
+  PUBLISHED
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  DISAPPROVED
+}
+
+model Person {
+  id         Int          @id @default(autoincrement())
+  personId   String       @unique @db.VarChar(26)
+  firstName  String       @db.VarChar(50)
+  middleName String?      @db.VarChar(50)
+  lastName   String       @db.VarChar(50)
+  gender     PersonGender
+  suffix     PersonSuffix
+  createdAt  DateTime     @default(now()) @db.Timestamp(0)
+  createdBy  String?      @db.VarChar(26)
+  updatedAt  DateTime?    @updatedAt
+  updatedBy  String?      @db.VarChar(26)
+
+  personContactDetails PersonContactDetails[]
+  user                 User?
+
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model ContactDetails {
+  id               Int     @id @default(autoincrement())
+  contactDetailsId String  @unique @db.VarChar(26)
+  name             String  @unique @db.VarChar(50)
+  description      String? @db.Text
+
+  personContactDetails PersonContactDetails[]
+}
+
+model PersonContactDetails {
+  id                     Int       @id @default(autoincrement())
+  personContactDetailsId String    @unique @db.VarChar(26)
+  contactDetailsId       String    @db.VarChar(26)
+  personId               String    @db.VarChar(26)
+  value                  String    @db.VarChar(255)
+  createdAt              DateTime  @default(now()) @db.Timestamp(0)
+  createdBy              String?   @db.VarChar(26)
+  updatedAt              DateTime? @updatedAt
+  updatedBy              String?   @db.VarChar(26)
+
+  person         Person         @relation(fields: [personId], references: [personId])
+  contactDetails ContactDetails @relation(fields: [contactDetailsId], references: [contactDetailsId])
+
+  @@index([personId])
+  @@index([contactDetailsId])
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model User {
+  id             Int    @id @default(autoincrement())
+  userId         String @unique @db.VarChar(26)
+  personId       String @unique @db.VarChar(26)
+  roleId         String @db.VarChar(26)
+  organizationId String @db.VarChar(26)
+  agency         String @db.Text
+  username       String @unique @db.VarChar(50)
+
+  password String     @db.VarChar(255)
+  isActive Int        @default(0) @db.TinyInt
+  status   UserStatus @default(PENDING)
+  avatar   String?    @db.Text
+
+  createdAt DateTime  @default(now()) @db.Timestamp(0)
+  createdBy String?   @db.VarChar(26)
+  updatedAt DateTime? @updatedAt
+  updatedBy String?   @db.VarChar(26)
+
+  person       Person       @relation(fields: [personId], references: [personId])
+  role         Role         @relation(fields: [roleId], references: [roleId])
+  organization Organization @relation(fields: [organizationId], references: [organizationId])
+  documents    Document[]
+
+  tokens        Token[]
+  plots         Plot[]
+  articles      Article[]
+  millDistricts UserMillDistrict[]
+
+  @@index([personId])
+  @@index([roleId])
+  @@index([organizationId])
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model Document {
+  id         Int       @id @default(autoincrement())
+  documentId String    @unique @db.VarChar(26)
+  userId     String    @db.VarChar(26)
+  file       Bytes     @db.Blob
+  createdAt  DateTime  @default(now()) @db.Timestamp(0)
+  createdBy  String?   @db.VarChar(26)
+  updatedAt  DateTime? @updatedAt
+  updatedBy  String?   @db.VarChar(26)
+
+  user User @relation(fields: [userId], references: [userId])
+
+  @@index([userId])
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  roleId      String  @unique @db.VarChar(26)
+  name        String  @unique @db.VarChar(50)
+  description String? @db.Text
+
+  users User[]
+}
+
+model Organization {
+  id             Int     @id @default(autoincrement())
+  organizationId String  @unique @db.VarChar(26)
+  name           String  @unique @db.VarChar(50)
+  description    String? @db.Text
+
+  users User[]
+}
+
+model Token {
+  id        Int       @id @default(autoincrement())
+  tokenId   String    @unique @db.VarChar(26)
+  userId    String    @db.VarChar(26)
+  type      TokenType
+  value     String    @db.Text
+  createdAt DateTime  @default(now()) @db.Timestamp(0)
+  createdBy String    @db.VarChar(26)
+  updatedAt DateTime? @updatedAt
+  updatedBy String?   @db.VarChar(26)
+
+  user User @relation(fields: [userId], references: [userId])
+
+  @@index([userId])
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model Region {
+  id          Int       @id @default(autoincrement())
+  regionId    String    @unique @db.VarChar(26)
+  name        String    @unique @db.VarChar(50)
+  description String?   @db.Text
+  shapeFile   String    @db.Text
+  createdAt   DateTime  @default(now()) @db.Timestamp(0)
+  createdBy   String    @db.VarChar(26)
+  updatedAt   DateTime? @updatedAt
+  updatedBy   String?   @db.VarChar(26)
+
+  millDistricts MillDistrict[]
+  provinces     Province[]
+
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model Province {
+  id          Int       @id @default(autoincrement())
+  provinceId  String    @unique @db.VarChar(26)
+  regionId    String    @db.VarChar(26)
+  name        String    @unique @db.VarChar(50)
+  description String?   @db.Text
+  shapeFile   String    @db.Text
+  createdAt   DateTime  @default(now()) @db.Timestamp(0)
+  createdBy   String    @db.VarChar(26)
+  updatedAt   DateTime? @updatedAt
+  updatedBy   String?   @db.VarChar(26)
+
+  cities City[]
+  region Region @relation(fields: [regionId], references: [regionId])
+
+  @@index([regionId])
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model City {
+  id          Int       @id @default(autoincrement())
+  cityId      String    @unique @db.VarChar(26)
+  provinceId  String    @db.VarChar(26)
+  name        String    @unique @db.VarChar(50)
+  description String?   @db.VarChar(50)
+  shapeFile   String    @db.Text
+  createdAt   DateTime  @default(now()) @db.Timestamp(0)
+  createdBy   String    @db.VarChar(26)
+  updatedAt   DateTime? @updatedAt
+  updatedBy   String?   @db.VarChar(26)
+
+  barangays Barangay[]
+  region    Province   @relation(fields: [provinceId], references: [provinceId])
+
+  @@index([provinceId])
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model Barangay {
+  id          Int       @id @default(autoincrement())
+  barangayId  String    @unique @db.VarChar(26)
+  cityId      String    @db.VarChar(26)
+  name        String    @unique @db.VarChar(50)
+  description String?   @db.VarChar(50)
+  shapeFile   String    @db.Text
+  createdAt   DateTime  @default(now()) @db.Timestamp(0)
+  createdBy   String    @db.VarChar(26)
+  updatedAt   DateTime? @updatedAt
+  updatedBy   String?   @db.VarChar(26)
+
+  city City @relation(fields: [cityId], references: [cityId])
+
+  @@index([cityId])
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model Legend {
+  id          Int       @id @default(autoincrement())
+  legendId    String    @unique @db.VarChar(26)
+  name        String    @unique @db.VarChar(50)
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @db.Timestamp(0)
+  createdBy   String    @db.VarChar(26)
+  updatedAt   DateTime? @updatedAt
+  updatedBy   String?   @db.VarChar(26)
+
+  millDistrictLegend millDistrictLegend[]
+
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model MillDistrict {
+  id             Int       @id @default(autoincrement())
+  millDistrictId String    @unique @db.VarChar(26)
+  regionId       String    @db.VarChar(26)
+  name           String    @unique @db.VarChar(50)
+  description    String?   @db.Text
+  createdAt      DateTime  @default(now()) @db.Timestamp(0)
+  createdBy      String    @db.VarChar(26)
+  updatedAt      DateTime? @updatedAt
+  updatedBy      String?   @db.VarChar(26)
+
+  region             Region               @relation(fields: [regionId], references: [regionId])
+  users              UserMillDistrict[]
+  millDistrictLegend millDistrictLegend[]
+
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model millDistrictLegend {
+  id Int @id @default(autoincrement())
+
+  millDistrictId String @db.VarChar(26)
+  legendId       String @db.VarChar(26)
+
+  millDistrict MillDistrict @relation(fields: [millDistrictId], references: [millDistrictId])
+  legend       Legend       @relation(fields: [legendId], references: [legendId])
+}
+
+model UserMillDistrict {
+  id             Int    @id @default(autoincrement())
+  userId         String @db.VarChar(26)
+  millDistrictId String @db.VarChar(26)
+
+  user         User         @relation(fields: [userId], references: [userId])
+  millDistrict MillDistrict @relation(fields: [millDistrictId], references: [millDistrictId])
+
+  @@unique([userId, millDistrictId])
+}
+
+model Crop {
+  id          Int     @id @default(autoincrement())
+  cropId      String  @unique @db.VarChar(26)
+  name        String  @unique @db.VarChar(50)
+  description String? @db.Text
+}
+
+model Plot {
+  id                 Int       @id @default(autoincrement())
+  plotId             String    @unique @db.VarChar(26)
+  millDistrictId     String    @db.VarChar(26)
+  gisNumber          String?   @db.VarChar(50)
+  varietyPlanted     String?   @db.VarChar(50)
+  datePlantedRatoon  DateTime? @db.Timestamp(0)
+  dateHarvested      DateTime? @db.Timestamp(0)
+  establishment      String?   @db.VarChar(50)
+  farmSystem         String?   @db.VarChar(50)
+  furrowDistance     Decimal?  @db.Decimal(18, 5)
+  percentGermination Int?
+  noMillTalks        String?   @db.VarChar(50)
+  height             Int?
+  noInterNode        Int?
+  msDiameterTop      Decimal?  @db.Decimal(18, 5)
+  msDiameterMid      Decimal?  @db.Decimal(18, 5)
+  msDiameterBase     Decimal?  @db.Decimal(18, 5)
+  msLength           Decimal?  @db.Decimal(18, 5)
+  msWeight           Decimal?  @db.Decimal(18, 5)
+  brixTop            Decimal?  @db.Decimal(18, 5)
+  brixMid            Decimal?  @db.Decimal(18, 5)
+  brixBase           Decimal?  @db.Decimal(18, 5)
+  elevation          Decimal?  @db.Decimal(18, 5)
+  slope              Decimal?  @db.Decimal(18, 5)
+  soilTexture        Decimal?  @db.Decimal(18, 5)
+  createdAt          DateTime  @default(now()) @db.Timestamp(0)
+  createdBy          String    @db.VarChar(26)
+  updatedAt          DateTime? @updatedAt
+  updatedBy          String?   @db.VarChar(26)
+
+  user User @relation(fields: [createdBy], references: [userId])
+
+  @@index([millDistrictId])
+  @@index([createdBy])
+  @@index([updatedBy])
+}
+
+model Article {
+  id        Int           @id @default(autoincrement())
+  articleId String        @unique @db.VarChar(26)
+  userId    String        @db.VarChar(26)
+  title     String        @unique @db.VarChar(50)
+  content   String        @db.MediumText
+  isActive  Int           @default(0) @db.TinyInt
+  status    ArticleStatus @default(PENDING)
+  createdAt DateTime      @default(now()) @db.Timestamp(0)
+  createdBy String        @db.VarChar(26)
+  updatedAt DateTime?     @updatedAt
+  updatedBy String        @db.VarChar(26)
+
+  user User @relation(fields: [userId], references: [userId])
+
+  @@index([userId])
+  @@index([createdBy])
+  @@index([updatedBy])
+}

@@ -1,7 +1,16 @@
-import { Request, Response } from 'express';
+import { request, response } from 'express';
 
-const listUsers = async (req: Request, res: Response): Promise<any> => {};
+const signup = async (req = request, res = response) => {};
 
-const createUser = async (req: Request, res: Response): Promise<any> => {};
+const forgotPassword = async (req = request, res = response) => {};
 
-export default { listUsers } as const;
+const validateForgotPasswordLink = async (req = request, res = response) => {};
+
+const changePassword = async (req = request, res = response) => {};
+
+export default {
+  signup,
+  forgotPassword,
+  validateForgotPasswordLink,
+  changePassword,
+} as const;

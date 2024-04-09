@@ -31,7 +31,7 @@ Table PersonContactDetails {
   personContactDetailsId String [unique, not null]
   contactDetailsId String [not null]
   personId String [not null]
-  value String [not null]
+  value String [unique, not null]
   createdAt DateTime [default: `now()`, not null]
   createdBy String
   updatedAt DateTime

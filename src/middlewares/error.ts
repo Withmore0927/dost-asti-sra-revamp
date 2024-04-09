@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 
 export default (
-  _err: any,
-  _request: Request,
+  err: any,
+  request: Request,
   response: Response,
   next: NextFunction,
 ): Response => {
-  console.log(_err);
+  console.log(err);
 
   return response
     .status(500)

@@ -1,9 +1,9 @@
-import jwt, { JsonWebTokenError } from 'jsonwebtoken';
+import jwt, { JsonWebTokenError, JwtPayload, SignOptions } from 'jsonwebtoken';
 
 const generate = async (
-  payload = {},
-  secret = '',
-  options = {},
+  payload: JwtPayload,
+  secret: string,
+  options: SignOptions,
 ): Promise<string | undefined | JsonWebTokenError> => {
   try {
     return await new Promise((resolve, reject) => {
@@ -13,7 +13,7 @@ const generate = async (
       });
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw new Error(String(error));
   }
 };

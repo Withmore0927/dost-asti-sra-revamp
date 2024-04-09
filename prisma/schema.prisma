@@ -78,7 +78,7 @@ model PersonContactDetails {
   personContactDetailsId String    @unique @db.VarChar(26)
   contactDetailsId       String    @db.VarChar(26)
   personId               String    @db.VarChar(26)
-  value                  String    @db.VarChar(255)
+  value                  String    @db.VarChar(255) @unique
   createdAt              DateTime  @default(now()) @db.Timestamp(0)
   createdBy              String?   @db.VarChar(26)
   updatedAt              DateTime? @updatedAt

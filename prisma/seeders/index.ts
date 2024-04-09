@@ -17,7 +17,6 @@ enum PersonSuffix {
 }
 
 enum UserStatus {
-  FOR_APPROVAL = 'FOR_APPROVAL',
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
   DISAPPROVED = 'DISAPPROVED',
@@ -48,15 +47,15 @@ async function main() {
     },
     {
       organizationId: ulid(),
-      name: 'LGU',
+      name: 'government_agency',
     },
     {
       organizationId: ulid(),
-      name: 'Private Company',
+      name: 'private_company',
     },
     {
       organizationId: ulid(),
-      name: 'Academy',
+      name: 'academy',
     },
   ];
 
@@ -70,7 +69,6 @@ async function main() {
       personId,
       firstName: 'Admin',
       lastName: 'Administrator',
-      roleId: roles[0].roleId,
       gender: PersonGender.MALE,
       suffix: PersonSuffix.MR,
     },

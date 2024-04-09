@@ -1,30 +1,18 @@
 import { PrismaClient } from '@prisma/client';
 
-let connection: any;
+const logLevel = process.env.NODE_ENV === 'development' ? 'query' : 'info';
 
-if (process.env.NODE_ENV === 'development') {
-  connection = new PrismaClient({
-    errorFormat: 'pretty',
-    log: [
-      {
-        emit: 'event',
-        level: 'query',
-      },
-    ],
-  });
+const connection = new PrismaClient({
+  errorFormat: 'pretty',
+  log: [{ level: logLevel, emit: 'event' }],
+});
 
-  connection.$on('query', async (e: any) => {
-    console.log(`${e.query} ${e.params}`);
-  });
-} else {
-  connection = new PrismaClient({
-    errorFormat: 'pretty',
-    log: [{ level: 'info', emit: 'event' }],
-  });
+connection.$on('info', async (e: any) => {
+  console.log(`${e.event}`);
+});
 
-  connection.$on('event', async (e: any) => {
-    console.log(`${e.event}`);
-  });
-}
+connection.$on('query', async (e: any) => {
+  console.log(`${e.query} ${e.event}`);
+});
 
 export default connection;
